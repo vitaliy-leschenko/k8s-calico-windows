@@ -4,11 +4,19 @@ param(
     [version]$minK8sVersion = "1.22.0"
 )
 
+docker buildx create --name img-builder --use --platform windows/amd64
+
 pushd calico
 write-host "build calico"
-./build.sh -r $repository --calicoVersion "v$calicoVersion"
+pushd install
+docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=CALICO_VERSION=v$calicoVersion -f Dockerfile.install -t $repository/calico-install:v$calicoVersion-hostprocess .
+popd
+pushd node
+docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=CALICO_VERSION=v$calicoVersion -f Dockerfile.node -t $repository/calico-node:v$calicoVersion-hostprocess .
+popd
 
 write-host "build kube-proxy"
+pushd kube-proxy
 $versions = (curl -L k8s.gcr.io/v2/kube-proxy/tags/list | ConvertFrom-Json).tags
 foreach($version in $versions)
 {
@@ -17,17 +25,11 @@ foreach($version in $versions)
         $testVersion = [version]$Matches[1]
         if ($testVersion -ge $minK8sVersion)
         {
-            ./build.sh -r $repository --proxyVersion $version
+            Write-Host "Build $version"
+            docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=k8sVersion=$version -f Dockerfile -t $repository/kube-proxy:$version-calico-hostprocess .
         }
-        else
-        {
-            Write-Host "Skip $version because it less than $minK8sVersion."
-        }
-    }
-    else
-    {
-        Write-Host "Skip $version because it isn't release version."
     }
 }
+popd
 
 popd
