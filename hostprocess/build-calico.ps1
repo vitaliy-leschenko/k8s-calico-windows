@@ -4,8 +4,6 @@ param(
     [version]$minK8sVersion = "1.22.0"
 )
 
-docker buildx create --name img-builder --use --platform windows/amd64
-
 pushd calico
 write-host "build calico"
 $calicoVersions = (curl -L https://api.github.com/repos/projectcalico/calico/releases | ConvertFrom-Json) | % tag_name
