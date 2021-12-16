@@ -7,15 +7,15 @@ param(
 pushd flannel
 write-host "build flannel"
 pushd flanneld
-$calicoVersions = (curl -L https://api.github.com/repos/flannel-io/flannel/releases | ConvertFrom-Json) | % tag_name
-foreach($flannelVersion in $calicoVersions)
+$flannelVersions = (curl -L https://api.github.com/repos/flannel-io/flannel/releases | ConvertFrom-Json) | % tag_name
+foreach($flannelVersion in $flannelVersions)
 {
     if ($flannelVersion -match "^v(\d+\.\d+\.\d+)$")
     {
         $testVersion = [version]$Matches[1]
         if ($testVersion -ge $minFlannelVersion)
         {
-            Write-Host "Build images for flannel $calicoVersion"
+            Write-Host "Build images for flannel $flannelVersion"
             docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=flannelVersion=$flannelVersion -f Dockerfile -t $repository/flannel:$flannelVersion-hostprocess .
         }
     }
