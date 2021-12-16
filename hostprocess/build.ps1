@@ -1,6 +1,6 @@
 param(
     [string]$repository = "vleschenko",
-    [version]$calicoVersion = "3.21.2",
+    [version]$minCalicoVersion = "3.20.0",
     [version]$minK8sVersion = "1.22.0"
 )
 
@@ -8,12 +8,25 @@ docker buildx create --name img-builder --use --platform windows/amd64
 
 pushd calico
 write-host "build calico"
-pushd install
-docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=CALICO_VERSION=v$calicoVersion -f Dockerfile.install -t $repository/calico-install:v$calicoVersion-hostprocess .
-popd
-pushd node
-docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=CALICO_VERSION=v$calicoVersion -f Dockerfile.node -t $repository/calico-node:v$calicoVersion-hostprocess .
-popd
+$calicoVersions = (curl -L https://api.github.com/repos/projectcalico/calico/releases | ConvertFrom-Json) | % tag_name
+foreach($calicoVersion in $calicoVersions)
+{
+    if ($calicoVersion -match "^v(\d+\.\d+\.\d+)$")
+    {
+        $testVersion = [version]$Matches[1]
+        if ($testVersion -ge $minCalicoVersion)
+        {
+            Write-Host "Build images for calico $calicoVersion"
+            pushd install
+            docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=CALICO_VERSION=$calicoVersion -f Dockerfile.install -t $repository/calico-install:$calicoVersion-hostprocess .
+            popd
+            pushd node
+            docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=CALICO_VERSION=$calicoVersion -f Dockerfile.node -t $repository/calico-node:$calicoVersion-hostprocess .
+            popd
+        }
+    }
+}
+
 
 write-host "build kube-proxy"
 pushd kube-proxy
@@ -25,7 +38,7 @@ foreach($version in $versions)
         $testVersion = [version]$Matches[1]
         if ($testVersion -ge $minK8sVersion)
         {
-            Write-Host "Build $version"
+            Write-Host "Build image for kube-proxy $version"
             docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=k8sVersion=$version -f Dockerfile -t $repository/kube-proxy:$version-calico-hostprocess .
         }
     }
