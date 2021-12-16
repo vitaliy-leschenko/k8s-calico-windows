@@ -1,6 +1,6 @@
 param(
     [string]$repository = "vleschenko",
-    [version]$minCalicoVersion = "3.20.0",
+    [version]$minCalicoVersion = "3.19.0",
     [version]$minK8sVersion = "1.22.0"
 )
 
