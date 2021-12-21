@@ -16,7 +16,7 @@ foreach($flannelVersion in $flannelVersions)
         if ($testVersion -ge $minFlannelVersion)
         {
             Write-Host "Build images for flannel $flannelVersion"
-            docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=flannelVersion=$flannelVersion -f Dockerfile -t $repository/flannel:$flannelVersion-hostprocess ./flanneld
+            docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=flannelVersion=$flannelVersion -f ./flanneld/Dockerfile -t $repository/flannel:$flannelVersion-hostprocess ./flanneld
         }
     }
 }
@@ -31,7 +31,7 @@ foreach($version in $versions)
         if ($testVersion -ge $minK8sVersion)
         {
             Write-Host "Build image for kube-proxy $version"
-            docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=k8sVersion=$version -f Dockerfile -t $repository/kube-proxy:$version-flannel-hostprocess ./kube-proxy
+            docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=k8sVersion=$version -f ./kube-proxy/Dockerfile -t $repository/kube-proxy:$version-flannel-hostprocess ./kube-proxy
         }
     }
 }

@@ -16,8 +16,8 @@ foreach($calicoVersion in $calicoVersions)
         if ($testVersion -ge $minCalicoVersion)
         {
             Write-Host "Build images for calico $calicoVersion"
-            docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=CALICO_VERSION=$calicoVersion -f Dockerfile.install -t $repository/calico-install:$calicoVersion-hostprocess ./install
-            docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=CALICO_VERSION=$calicoVersion -f Dockerfile.node -t $repository/calico-node:$calicoVersion-hostprocess ./node
+            docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=CALICO_VERSION=$calicoVersion -f ./install/Dockerfile.install -t $repository/calico-install:$calicoVersion-hostprocess ./install
+            docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=CALICO_VERSION=$calicoVersion -f ./node/Dockerfile.node -t $repository/calico-node:$calicoVersion-hostprocess ./node
         }
     }
 }
@@ -32,7 +32,7 @@ foreach($version in $versions)
         if ($testVersion -ge $minK8sVersion)
         {
             Write-Host "Build image for kube-proxy $version"
-            docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=k8sVersion=$version -f Dockerfile -t $repository/kube-proxy:$version-calico-hostprocess ./kube-proxy
+            docker buildx build --platform windows/amd64 --output=type=registry --pull --build-arg=k8sVersion=$version -f ./kube-proxy/Dockerfile -t $repository/kube-proxy:$version-calico-hostprocess ./kube-proxy
         }
     }
 }
