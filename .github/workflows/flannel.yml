@@ -1,4 +1,4 @@
-name: hostprocess-images
+name: hostprocess-flannel
 
 on:
   schedule:
