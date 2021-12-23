@@ -28,12 +28,12 @@ $cniJson.delegate.AdditionalArgs[2].Value.Settings.DestinationPrefix = $manageme
 
 Set-Content -Path c:/etc/cni/net.d/10-flannel.conf ($cniJson | ConvertTo-Json -depth 100)
 
-$network = Get-HNSNetwork | ? Name -eq "External";
-if ($network -eq $null) {
-  New-HNSNetwork -Type Overlay -AddressPrefix "192.168.255.0/30" -Gateway "192.168.255.1" -Name "External" -AdapterName "Ethernet";
-} elseif ($network.Type -ne "Overlay") {
-  Write-Warning "'External' network already exists but has wrong type: $($network.Type)."
-}
+#$network = Get-HNSNetwork | ? Name -eq "External";
+#if ($network -eq $null) {
+#  New-HNSNetwork -Type Overlay -AddressPrefix "192.168.255.0/30" -Gateway "192.168.255.1" -Name "External" -AdapterName "Ethernet";
+#} elseif ($network.Type -ne "Overlay") {
+#  Write-Warning "'External' network already exists but has wrong type: $($network.Type)."
+#}
 
 # set route for metadata servers in clouds
 # https://github.com/kubernetes-sigs/sig-windows-tools/issues/36
