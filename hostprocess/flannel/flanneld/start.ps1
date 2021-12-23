@@ -38,11 +38,11 @@ if ($network -eq $null) {
 # set route for metadata servers in clouds
 # https://github.com/kubernetes-sigs/sig-windows-tools/issues/36
 Write-Host "add route"
-route /p add 169.254.169.254 mask 255.255.255.255 0.0.0.0
+route /p add 169.254.169.254 mask 255.255.255.255 0.0.0.0 | out-null
 
-#write-host "copy sa info (should be able to do this with a change to go client"
-#mkdir -force $env:CONTAINER_SANDBOX_MOUNT_POINT/flannel-config-file/var/run/secrets/kubernetes.io/serviceaccount/
-#cp -force $env:CONTAINER_SANDBOX_MOUNT_POINT/var/run/secrets/kubernetes.io/serviceaccount/* $env:CONTAINER_SANDBOX_MOUNT_POINT/flannel-config-file/var/run/secrets/kubernetes.io/serviceaccount/
+write-host "copy sa info (should be able to do this with a change to go client)"
+mkdir -force $env:CONTAINER_SANDBOX_MOUNT_POINT/flannel-config-file/var/run/secrets/kubernetes.io/serviceaccount/
+cp -force $env:CONTAINER_SANDBOX_MOUNT_POINT/var/run/secrets/kubernetes.io/serviceaccount/* $env:CONTAINER_SANDBOX_MOUNT_POINT/flannel-config-file/var/run/secrets/kubernetes.io/serviceaccount/
 
 Write-Host "envs"
 write-host $env:POD_NAME
