@@ -1,9 +1,12 @@
-name: hostprocess-images
+name: hostprocess-calico
 
 on:
   schedule:
   - cron: "0 0 * * *"
   push:
+    paths:
+      - "hostprocess/calico/**"
+      - "hostprocess/build-calico.ps1"
     branches:
       - master
 
@@ -23,6 +26,3 @@ jobs:
     - name: Build and push images for calico
       run: |
         ./build-calico.ps1
-    - name: Build and push images for flannel
-      run: |
-        ./build-flannel.ps1
