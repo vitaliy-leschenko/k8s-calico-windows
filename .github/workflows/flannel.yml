@@ -1,8 +1,6 @@
 name: hostprocess-flannel
 
 on:
-  schedule:
-  - cron: "0 0 * * *"
   push:
     paths:
       - "hostprocess/flannel/**"
